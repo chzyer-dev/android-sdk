@@ -100,7 +100,7 @@ public class Client {
 				String xl = resp.getFirstHeader("X-Log").getValue();
 
 				if (statusCode == 401) return new Exception("unauthorized!"); // android 2.3 will not response
-				if (xl.contains("invalid BlockCtx")) return new Exception(xl);
+				if (statusCode == 701 || xl.contains("invalid BlockCtx")) return new Exception("invalid BlockCtx");
 
 				byte[] data = EntityUtils.toByteArray(resp.getEntity());
 				if (statusCode / 100 == 2) return data;
