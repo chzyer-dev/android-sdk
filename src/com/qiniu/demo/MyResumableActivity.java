@@ -48,7 +48,7 @@ public class MyResumableActivity extends Activity implements View.OnClickListene
 			return;
 		}
 		if (view.equals(stop)) {
-			if (uploadUri == null) {
+			if (! uploadStarted) {
 				Toast.makeText(this, "还没开始任务", 20).show();
 				return;
 			}
@@ -68,8 +68,10 @@ public class MyResumableActivity extends Activity implements View.OnClickListene
 	int taskId = -1;
 	Uri uploadUri;
 	PutExtra mExtra;
+	boolean uploadStarted = false;
 
 	public void doResumableUpload(final Uri uri, PutExtra extra) {
+		uploadStarted = true;
 		hint.setText("连接中");
 		String key = null;
 		String token = "<token>";
@@ -78,6 +80,7 @@ public class MyResumableActivity extends Activity implements View.OnClickListene
 		taskId = ResumableIO.putFile(this, token, key, uri, extra, new JSONObjectRet() {
 			@Override
 			public void onSuccess(JSONObject obj) {
+				uploadStarted = false;
 				hint.setText("上传成功: " + obj.optString("key", ""));
 			}
 
@@ -91,11 +94,13 @@ public class MyResumableActivity extends Activity implements View.OnClickListene
 			@Override
 			public void onPause(Object tag) {
 				uploadUri = uri;
+				uploadStarted = false;
 				mExtra = (PutExtra) tag;
 			}
 
 			@Override
 			public void onFailure(Exception ex) {
+				uploadStarted = false;
 				hint.setText(ex.getMessage());
 			}
 		});
